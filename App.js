@@ -6,12 +6,13 @@ export default function App() {
   function fetchCountriesData() {
     fetch('https://restcountries.eu/rest/v2/region/africa?fields=name;capital')
       .then((response) => response.json())
-      .then((json) => setCountriesData(json))
+      .then((json) => {setCountriesData(json),console.log(json)}
+      )
       .catch((error) => console.error(error))
   }
   useEffect(()=> {
     fetchCountriesData();
-  })
+  },[])
   return (
     <>
       <StatusBar style='light'/>
@@ -19,7 +20,7 @@ export default function App() {
         data={countriesData}
         contentContainerStyle={styles.container}
         keyExtractor={item => item.name}
-        renderItem={({item})=> <Text onPress={() => {Alert.alert(`The Capital of ${item.name} is ${item.capital}`)}} style={styles.text}>{item.name}</Text>}
+        renderItem={({item})=> <Text onPress={() => {Alert.alert(`The Capital of ${item.name, console.log('HI')} is ${item.capital}`)}} style={styles.text}>{item.name}</Text>}
       />
     </>
   );
@@ -32,6 +33,8 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 18,
     margin: 5,
-    color: '#fff'
+    color: '#fff',
+    textAlign: 'center',
   },
 });
+
