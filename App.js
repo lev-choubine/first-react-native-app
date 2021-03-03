@@ -1,9 +1,9 @@
 import {Card, Title, Button, Divider} from 'react-native-paper'
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import {Logo, ImageBackground}from 'react-native'
+import {Logo, ImageBackground, Platform}from 'react-native'
 import {Header, Icon} from 'react-native-elements'
-
 import AudioRecorderPlayer, {
+ 
  AVEncoderAudioQualityIOSType,
  AVEncodingOption,
  AudioEncoderAndroidType,
@@ -26,11 +26,44 @@ class App extends Component {
         duration: '00:00:00',
       };
       this.audioRecorderPlayer = new AudioRecorderPlayer();
-      this.audioRecorderPlayer.setSubscriptionDuration(0.09); // optional. Default is 0.
+      console.log(this.audioRecorderPlayer)
+      console.log(this.audioRecorderPlayer.setSubscriptionDuration)
+     
+      
+       // optional. Default is 0.
     }
 
+
+
+
+    
+    
     onStartRecord = async () => {
-          const path = 'hello.m4a';
+      if (Platform.OS==='android') {
+        try {
+          const granted = await PermissionsAndroid.request(
+            PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
+            {
+              title: 'Permissions for write access',
+              message: 'Give permission to your storage to write a file',
+              buttonPositive: 'ok',
+            },
+          );
+          if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+            console.log('You can use the camera');
+          } else {
+            console.log('permission denied');
+            return;
+          }
+        } catch (err) {
+          console.warn(err);
+          return;
+        }
+      }
+      const path = Platform.select({
+        ios: 'hello.m4a',
+        android: 'sdcard/hello.mp4', // should give extra dir name in android. Won't grant permission to the first level of dir.
+    });
           const audioSet = {
             AudioEncoderAndroid: AudioEncoderAndroidType.AAC,
             AudioSourceAndroid: AudioSourceAndroidType.MIC,
@@ -39,6 +72,7 @@ class App extends Component {
             AVFormatIDKeyIOS: AVEncodingOption.aac,
           };
           console.log('audioSet', audioSet);
+          console.log(path);
           const uri = await this.audioRecorderPlayer.startRecorder(path, audioSet);
           this.audioRecorderPlayer.addRecordBackListener((e) => {
             this.setState({
